@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { 
   Card, 
@@ -33,19 +33,63 @@ import {
   TableRow 
 } from '@/components/ui/table';
 import { 
-  User, 
   Shield, 
   Briefcase, 
   Bell, 
   Lock, 
-  UserPlus 
+  Pencil
 } from 'lucide-react';
 import { RequireAuth } from '@/components/RequireAuth';
+import { AddUserDialog } from '@/components/AddUserDialog';
+import { TeamMemberRole } from '@/types';
+
+// Mock users for the demo
+const MOCK_USERS = [
+  {
+    id: '1',
+    name: 'Admin User',
+    email: 'admin@example.com',
+    role: 'admin',
+    teamRole: 'project manager',
+    status: 'active'
+  },
+  {
+    id: '2',
+    name: 'Team Member',
+    email: 'member@example.com',
+    role: 'member',
+    teamRole: 'frontend developer',
+    status: 'active'
+  }
+];
 
 const Settings: React.FC = () => {
   const { user } = useAuth();
+  const [users, setUsers] = useState(MOCK_USERS);
   
   if (!user) return null;
+
+  const handleUserAdded = () => {
+    // In a real implementation, this would fetch updated users from the API
+    console.log('User added, refreshing user list');
+  };
+
+  const getStatusBadgeClass = (status: string) => {
+    switch (status) {
+      case 'active':
+        return 'bg-green-100 text-green-800';
+      case 'inactive':
+        return 'bg-gray-100 text-gray-800';
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const formatTeamRole = (role: string) => {
+    return role.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+  };
 
   return (
     <RequireAuth allowedRoles={['admin']}>
@@ -75,10 +119,7 @@ const Settings: React.FC = () => {
                       Manage your team members and their access
                     </CardDescription>
                   </div>
-                  <Button>
-                    <UserPlus className="h-4 w-4 mr-2" />
-                    Add User
-                  </Button>
+                  <AddUserDialog onUserAdded={handleUserAdded} />
                 </div>
               </CardHeader>
               <CardContent>
@@ -88,37 +129,31 @@ const Settings: React.FC = () => {
                       <TableHead>Name</TableHead>
                       <TableHead>Email</TableHead>
                       <TableHead>Role</TableHead>
+                      <TableHead>Team Role</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    <TableRow>
-                      <TableCell className="font-medium">Admin User</TableCell>
-                      <TableCell>admin@example.com</TableCell>
-                      <TableCell>Admin</TableCell>
-                      <TableCell>
-                        <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
-                          Active
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <Button variant="outline" size="sm">Edit</Button>
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium">Team Member</TableCell>
-                      <TableCell>member@example.com</TableCell>
-                      <TableCell>Member</TableCell>
-                      <TableCell>
-                        <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
-                          Active
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <Button variant="outline" size="sm">Edit</Button>
-                      </TableCell>
-                    </TableRow>
+                    {users.map(user => (
+                      <TableRow key={user.id}>
+                        <TableCell className="font-medium">{user.name}</TableCell>
+                        <TableCell>{user.email}</TableCell>
+                        <TableCell className="capitalize">{user.role}</TableCell>
+                        <TableCell>{formatTeamRole(user.teamRole)}</TableCell>
+                        <TableCell>
+                          <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusBadgeClass(user.status)}`}>
+                            {user.status}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          <Button variant="outline" size="sm">
+                            <Pencil className="h-4 w-4 mr-1" />
+                            Edit
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
                   </TableBody>
                 </Table>
               </CardContent>
