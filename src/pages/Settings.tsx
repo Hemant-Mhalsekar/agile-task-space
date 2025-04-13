@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { 
@@ -8,15 +9,9 @@ import {
   CardTitle 
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { 
-  Switch 
-} from '@/components/ui/switch';
-import { 
-  Input 
-} from '@/components/ui/input';
-import { 
-  Label 
-} from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { 
   Tabs, 
   TabsContent, 
@@ -36,11 +31,16 @@ import {
   Briefcase, 
   Bell, 
   Lock, 
-  Pencil
+  Pencil,
+  Upload,
+  Palette
 } from 'lucide-react';
 import { RequireAuth } from '@/components/RequireAuth';
 import { AddUserDialog } from '@/components/AddUserDialog';
+import { ActivityLogCard } from '@/components/ActivityLogCard';
+import { TwoFactorSetup } from '@/components/TwoFactorSetup';
 import { TeamMemberRole } from '@/types';
+import { useToast } from '@/components/ui/use-toast';
 
 const MOCK_USERS = [
   {
@@ -64,6 +64,7 @@ const MOCK_USERS = [
 const Settings: React.FC = () => {
   const { user } = useAuth();
   const [users, setUsers] = useState(MOCK_USERS);
+  const { toast } = useToast();
   
   if (!user) return null;
 
@@ -88,6 +89,13 @@ const Settings: React.FC = () => {
     return role.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
   };
 
+  const handleSaveSettings = () => {
+    toast({
+      title: "Settings saved",
+      description: "Your settings have been saved successfully",
+    });
+  };
+
   return (
     <RequireAuth allowedRoles={['admin']}>
       <div className="space-y-6">
@@ -100,9 +108,11 @@ const Settings: React.FC = () => {
         
         <Tabs defaultValue="users">
           <TabsList className="mb-6">
+            <TabsTrigger value="users">Team</TabsTrigger>
             <TabsTrigger value="workspace">Workspace</TabsTrigger>
             <TabsTrigger value="notifications">Notifications</TabsTrigger>
             <TabsTrigger value="security">Security</TabsTrigger>
+            <TabsTrigger value="activity">Activity</TabsTrigger>
           </TabsList>
           
           <TabsContent value="users" className="space-y-6">
@@ -175,6 +185,30 @@ const Settings: React.FC = () => {
                   <Input id="workspace-description" defaultValue="Team task management workspace" />
                 </div>
                 
+                <div className="border rounded p-4 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-sm font-medium">Workspace Logo</h3>
+                      <p className="text-sm text-muted-foreground">Upload your team or company logo</p>
+                    </div>
+                    <Button variant="outline" size="sm">
+                      <Upload className="h-4 w-4 mr-2" />
+                      Upload
+                    </Button>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-sm font-medium">Workspace Theme</h3>
+                      <p className="text-sm text-muted-foreground">Customize the appearance of your workspace</p>
+                    </div>
+                    <Button variant="outline" size="sm">
+                      <Palette className="h-4 w-4 mr-2" />
+                      Customize
+                    </Button>
+                  </div>
+                </div>
+                
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
                     <Label>Public Workspace</Label>
@@ -195,7 +229,7 @@ const Settings: React.FC = () => {
                   <Switch defaultChecked />
                 </div>
                 
-                <Button>Save Changes</Button>
+                <Button onClick={handleSaveSettings}>Save Changes</Button>
               </CardContent>
             </Card>
           </TabsContent>
@@ -209,88 +243,159 @@ const Settings: React.FC = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Email Notifications</Label>
-                    <div className="text-sm text-muted-foreground">
-                      Receive email notifications for important updates
+                <div className="border rounded p-4 mb-4">
+                  <h3 className="text-sm font-medium mb-2">Email Notifications</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label>Daily Digest</Label>
+                        <div className="text-sm text-muted-foreground">
+                          Receive a summary of activities at the end of the day
+                        </div>
+                      </div>
+                      <Switch defaultChecked />
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label>Task Assignment</Label>
+                        <div className="text-sm text-muted-foreground">
+                          Get notified when tasks are assigned to you
+                        </div>
+                      </div>
+                      <Switch defaultChecked />
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label>Task Status Changes</Label>
+                        <div className="text-sm text-muted-foreground">
+                          Get notified when task status changes
+                        </div>
+                      </div>
+                      <Switch defaultChecked />
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label>Comments and Mentions</Label>
+                        <div className="text-sm text-muted-foreground">
+                          Get notified when someone comments or mentions you
+                        </div>
+                      </div>
+                      <Switch defaultChecked />
                     </div>
                   </div>
-                  <Switch defaultChecked />
                 </div>
                 
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Task Assignment Notifications</Label>
-                    <div className="text-sm text-muted-foreground">
-                      Get notified when tasks are assigned to you
+                <div className="border rounded p-4">
+                  <h3 className="text-sm font-medium mb-2">In-App Notifications</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label>Task Reminders</Label>
+                        <div className="text-sm text-muted-foreground">
+                          Receive reminders for upcoming tasks
+                        </div>
+                      </div>
+                      <Switch defaultChecked />
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label>System Notifications</Label>
+                        <div className="text-sm text-muted-foreground">
+                          Get notified about system updates and maintenance
+                        </div>
+                      </div>
+                      <Switch />
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label>Team Member Updates</Label>
+                        <div className="text-sm text-muted-foreground">
+                          Get notified when team members join or leave
+                        </div>
+                      </div>
+                      <Switch defaultChecked />
                     </div>
                   </div>
-                  <Switch defaultChecked />
                 </div>
                 
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Task Status Change Notifications</Label>
-                    <div className="text-sm text-muted-foreground">
-                      Get notified when task status changes
-                    </div>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Due Date Reminders</Label>
-                    <div className="text-sm text-muted-foreground">
-                      Receive reminders for upcoming task due dates
-                    </div>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-                
-                <Button>Save Preferences</Button>
+                <Button onClick={handleSaveSettings}>Save Preferences</Button>
               </CardContent>
             </Card>
           </TabsContent>
           
           <TabsContent value="security" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Password Settings</CardTitle>
+                  <CardDescription>
+                    Update your account password
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="current-password">Current Password</Label>
+                    <Input id="current-password" type="password" />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="new-password">New Password</Label>
+                    <Input id="new-password" type="password" />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="confirm-password">Confirm New Password</Label>
+                    <Input id="confirm-password" type="password" />
+                  </div>
+                  
+                  <Button>Update Password</Button>
+                </CardContent>
+              </Card>
+              
+              <TwoFactorSetup />
+            </div>
+            
             <Card>
               <CardHeader>
-                <CardTitle>Security Settings</CardTitle>
+                <CardTitle>Sessions</CardTitle>
                 <CardDescription>
-                  Manage your security preferences
+                  Manage your active sessions
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="current-password">Current Password</Label>
-                  <Input id="current-password" type="password" />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="new-password">New Password</Label>
-                  <Input id="new-password" type="password" />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="confirm-password">Confirm New Password</Label>
-                  <Input id="confirm-password" type="password" />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label>Two-Factor Authentication</Label>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="p-3 rounded-md border space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="font-medium">Current Session</div>
+                      <Badge variant="outline" className="bg-green-100 text-green-800">Active</Badge>
+                    </div>
                     <div className="text-sm text-muted-foreground">
-                      Add an extra layer of security to your account
+                      Chrome on Windows • Last active now
                     </div>
                   </div>
-                  <Switch />
+                  
+                  <div className="p-3 rounded-md border space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="font-medium">Mobile App</div>
+                      <Badge variant="outline" className="bg-green-100 text-green-800">Active</Badge>
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      iPhone • Last active 2 hours ago
+                    </div>
+                    <Button size="sm" variant="destructive">Revoke</Button>
+                  </div>
                 </div>
-                
-                <Button>Update Security Settings</Button>
               </CardContent>
             </Card>
+          </TabsContent>
+          
+          <TabsContent value="activity" className="space-y-6">
+            <ActivityLogCard />
           </TabsContent>
         </Tabs>
       </div>
