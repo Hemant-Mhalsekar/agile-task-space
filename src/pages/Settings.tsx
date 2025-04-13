@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { 
@@ -43,7 +42,6 @@ import { RequireAuth } from '@/components/RequireAuth';
 import { AddUserDialog } from '@/components/AddUserDialog';
 import { TeamMemberRole } from '@/types';
 
-// Mock users for the demo
 const MOCK_USERS = [
   {
     id: '1',
@@ -70,7 +68,6 @@ const Settings: React.FC = () => {
   if (!user) return null;
 
   const handleUserAdded = () => {
-    // In a real implementation, this would fetch updated users from the API
     console.log('User added, refreshing user list');
   };
 
@@ -97,13 +94,12 @@ const Settings: React.FC = () => {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
           <p className="text-muted-foreground">
-            Manage your application settings
+            Manage your Zidio Task Space settings
           </p>
         </div>
         
         <Tabs defaultValue="users">
           <TabsList className="mb-6">
-            <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="workspace">Workspace</TabsTrigger>
             <TabsTrigger value="notifications">Notifications</TabsTrigger>
             <TabsTrigger value="security">Security</TabsTrigger>
@@ -165,13 +161,13 @@ const Settings: React.FC = () => {
               <CardHeader>
                 <CardTitle>Workspace Settings</CardTitle>
                 <CardDescription>
-                  Customize your workspace preferences
+                  Customize your Zidio Task Space preferences
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-2">
                   <Label htmlFor="workspace-name">Workspace Name</Label>
-                  <Input id="workspace-name" defaultValue="Agile Task Space" />
+                  <Input id="workspace-name" defaultValue="Zidio Task Space" />
                 </div>
                 
                 <div className="space-y-2">

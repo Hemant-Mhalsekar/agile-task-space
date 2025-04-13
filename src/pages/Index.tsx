@@ -18,7 +18,7 @@ const Index = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted">
       <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4 text-brand-purple">Agile Task Space</h1>
+        <h1 className="text-4xl font-bold mb-4 text-brand-purple">Zidio Task Space</h1>
         <p className="text-xl text-muted-foreground">Redirecting to login...</p>
       </div>
     </div>
