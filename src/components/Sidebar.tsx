@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -40,7 +39,7 @@ export const Sidebar: React.FC = () => {
       <SidebarHeader className="p-4">
         <div className="flex items-center space-x-2">
           <div className="h-8 w-8 rounded-full bg-brand-purple"></div>
-          <div className="font-bold text-xl">Task Space</div>
+          <div className="font-bold text-xl">Zidio Task Manager</div>
         </div>
       </SidebarHeader>
       <SidebarContent>

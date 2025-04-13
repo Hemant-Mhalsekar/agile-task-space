@@ -59,7 +59,7 @@ const Login: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-brand-purple">Agile Task Space</h1>
+          <h1 className="text-3xl font-bold text-brand-purple">Zidio Task Manager</h1>
           <p className="text-muted-foreground mt-2">Your team's ultimate task management solution</p>
         </div>
         
